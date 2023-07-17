@@ -12,15 +12,21 @@ Inspired by a few utils that [John Carroll](https://twitter.com/TheContractorio)
 
 ## Usage
 ```
-python PotUtils.py--mode [MODE] --input [Potfile or path to potfile] --output [OUTPUT_FILE_PATH]
+python PotUtils.py--mode [MODE] --input [Potfile or path to potfile] --output [OUTPUT_FILE_PATH] --threads <number of threads>
 ```
+Tested on a 27GB Potfile and while it takes a wee bit of time with threading it runs!
 
-## Example
+![27G Potfile](image.png)
+### Example
 ```
-python PotUtils.py --mode pot2words --input input.txt --output output.txt
-python PotUtils.py --mode hex2words --input potfile.txt --output output.txt
-python PotUtils.py --mode both --input input.txt --output output.txt
+python PotUtils.py --mode pot2words --input input.txt --output output.txt --threads 10
+python PotUtils.py --mode hex2words --input potfile.txt --output output.txt --threads 10
+python PotUtils.py --mode both --input input.txt --output output.txt --threads 10
 ```
+When it uses threads in either pot2words or hex2words, the script will create X number of temporary files i.e 1 per thread then merge them at the end. When using the both mode, it'll do the same but merge all the outputs into one file.
 
 ## Future Plans
-Thread both scripts to allow for bigger potfiles
+- Add progress bar
+- Add more utils
+- Add checks for space on disk before splitting file
+- Add colouring to the script
