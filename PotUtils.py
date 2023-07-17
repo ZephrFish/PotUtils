@@ -76,7 +76,7 @@ def hex_worker(worker_id, queue, output_path):
                     hex_string = matches[0]
                     try:
                         text = binascii.unhexlify(hex_string)
-                        decoded_text = text.decode("utf-8", errors="replace")
+                        decoded_text = text.decode("cp1253", errors="replace")
                         outfile.write(decoded_text + "\n")
                     except binascii.Error as e:
                         print(f"Error decoding hex string: {e}", file=sys.stderr)
