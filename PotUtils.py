@@ -1,10 +1,10 @@
-import sys
-import re
-import binascii
 import argparse
-import tempfile
+import binascii
 import os
 import queue
+import re
+import sys
+import tempfile
 import threading
 
 
@@ -19,6 +19,7 @@ def pot_worker(worker_id, queue, output_path):
             output_file.write(last_field + "\n")
     print(f"Worker {worker_id} completed.")
 
+
 def pot2words_threaded(input_file_path, output_file_path, num_threads):
     lines_queue = queue.Queue()
 
@@ -31,7 +32,7 @@ def pot2words_threaded(input_file_path, output_file_path, num_threads):
 
     # read the input file and enqueue lines for the workers to process
     try:
-        with open(input_file_path, "r", errors='replace') as input_file:
+        with open(input_file_path, "r", errors="replace") as input_file:
             for line in input_file:
                 lines_queue.put(line.strip())
     except IOError as e:
@@ -82,6 +83,7 @@ def hex_worker(worker_id, queue, output_path):
                         print(f"Error decoding hex string: {e}", file=sys.stderr)
     print(f"Worker {worker_id} completed.")
 
+
 def hex2words_threaded(input_file_path, output_file_path, num_threads):
     lines_queue = queue.Queue()
 
@@ -115,7 +117,9 @@ def hex2words_threaded(input_file_path, output_file_path, num_threads):
     # merge output files from workers into final output file
     with open(output_file_path, "w", encoding="utf-8") as outfile:
         for i in range(num_threads):
-            with open(f"{output_file_path}_{i}", "r", encoding="utf-8") as worker_outfile:
+            with open(
+                f"{output_file_path}_{i}", "r", encoding="utf-8"
+            ) as worker_outfile:
                 for line in worker_outfile:
                     outfile.write(line)
     # delete worker output files
@@ -141,10 +145,27 @@ def merge_unique(input_file1, input_file2, output_file):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CLI tool for data conversion.")
-    parser.add_argument("--mode", choices=["pot2words", "hex2words", "both"], required=True, help="Conversion mode to use.")
-    parser.add_argument("--input", required=True, help="Path to the input file.")
-    parser.add_argument("--output", required=True, help="Path to the output file.")
-    parser.add_argument("--threads", type=int, default=1, help="Number of worker threads to use.")
+    parser.add_argument(
+        "--mode",
+        choices=["pot2words", "hex2words", "both"],
+        required=True,
+        help="Conversion mode to use.",
+    )
+    parser.add_argument(
+        "--input",
+        required=True,
+        help="Path to the input file."
+    )
+    parser.add_argument(
+        "--output",
+        required=True,
+        help="Path to the output file."
+    )
+    parser.add_argument(
+        "--threads",
+        type=int,
+        default=1, help="Number of worker threads to use."
+    )
     args = parser.parse_args()
 
     if args.mode == "pot2words":
@@ -152,10 +173,11 @@ if __name__ == "__main__":
     elif args.mode == "hex2words":
         hex2words_threaded(args.input, args.output, args.threads)
     elif args.mode == "both":
-        with tempfile.NamedTemporaryFile(delete=False) as tmp1, tempfile.NamedTemporaryFile(delete=False) as tmp2:
+        with tempfile.NamedTemporaryFile(
+            delete=False
+        ) as tmp1, tempfile.NamedTemporaryFile(delete=False) as tmp2:
             pot2words_threaded(args.input, tmp1.name, args.threads)
             hex2words_threaded(args.input, tmp2.name, args.threads)
             merge_unique(tmp1.name, tmp2.name, args.output)
             os.unlink(tmp1.name)
             os.unlink(tmp2.name)
-
